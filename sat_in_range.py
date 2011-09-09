@@ -3,10 +3,6 @@
 # Rudy Hardeman (Zarya)
 # with tnx to Joseph Armbruster for making the example
 
-import re
-from dateutil import parser
-from datetime import timedelta
-import datetime
 import ephem
 import math
 import os
