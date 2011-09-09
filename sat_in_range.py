@@ -25,6 +25,17 @@ if __name__ == '__main__':
     observer.long = _latlong[1]
     tles = GetTLEs()
 
+    sat_data = []
+    sat_prio = {
+        'OSCAR 8 (AO-8)':0,
+        'UOSAT 4 (UO-15)':0, 
+        'PHASE 3D (AO-40)':5, 
+        'RUBIN-2 & SAFIR-M':6, 
+        'SSETI EXPRESS (XO-53)':7,
+        'DELFI-C3 (DO-64)':2,
+        'HOPE-1 (HO-68)':10,
+    } 
+
     for tle in tles:
         sat = ephem.readtle(tle[0],tle[1],tle[2])
         try:
@@ -33,4 +44,10 @@ if __name__ == '__main__':
             continue
         sat.compute(observer)
         if math.degrees(sat.alt) > 0 and math.degrees(sat.az) > 0:
+            if tle[0] in sat_prio:
+                sat_data.append((tle[0],math.degrees(sat.alt),math.degrees(sat.az),sat_prio[tle[0]]))
+            else:
+                sat_data.append((tle[0],math.degrees(sat.alt),math.degrees(sat.az),0))
             print "%s:\t\t %4.1f %5.1f" % (tle[0],math.degrees(sat.alt),math.degrees(sat.az))
+    sat_data = sorted(sat_data, key=lambda sat: sat[3], reverse=True)
+    print sat_data
