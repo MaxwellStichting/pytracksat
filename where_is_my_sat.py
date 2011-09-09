@@ -1,7 +1,8 @@
-# Script to sit and poll for upcoming satellite passes.
-# Joseph Armbruster
+# Script to see wat sats are in range 
+#
+# Rudy Hardeman (Zarya)
+# Part of the code from Joseph Armbruster reused
 
-# TODO(joe) : clean up these imports
 import re
 from dateutil import parser
 from datetime import timedelta
@@ -13,7 +14,6 @@ import sys
 import time
 import urllib2
 
-# TODO(joe) : add getopt configuration options for this to main.
 _latlong = ('51.44915','5.48776') # user lat/long
 _notify = 30 # let us know this many minutes in advance to a pass
 _usevoice = False # use voice?
@@ -65,8 +65,8 @@ if __name__ == '__main__':
             f.write('\n')
             f.close()
             continue
-        if sat_data[0] < now and parser.parse(sat_data[2]) > now:
-            if sat_data[0] < now:
+        if sat_data[0] < ephem.localtime(rt):
+            if sat_data[0] < now and parser.parse(sat_data[2]) > now:
                 sat.compute(observer)
                 rt, ra, tt, ta, st, sa = observer.next_pass(sat)
                 print tle[0]
@@ -83,15 +83,3 @@ if __name__ == '__main__':
             f.write(str(ephem.localtime(st)))
             f.write('\n')
             f.close()
-
-'''        if minutesaway <= _notify:
-            print 'Comming in range ', tle[0]
-            print ' Time till Rise :', minutesaway
-            print ' Rise Time: ', ephem.localtime(rt)
-            print ' Rise Azimuth: ', ra
-            print ' Transit Time: ', ephem.localtime(tt)
-            print ' Transit Altitude: ', ta
-            print ' Set Time: ', ephem.localtime(st)
-            print ' Set Azimuth: ', sa
-            print "%4.1f %5.1f" % (math.degrees(sat.alt),math.degrees(sat.az))
-'''
