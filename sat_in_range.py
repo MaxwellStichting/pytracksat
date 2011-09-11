@@ -29,13 +29,14 @@ if __name__ == '__main__':
     sat_prio = {
         'OSCAR 8 (AO-8)':0,
         'UOSAT 4 (UO-15)':0, 
-        'PHASE 3D (AO-40)':5, 
+        'PHASE 3D (AO-40)':0, 
         'RUBIN-2 & SAFIR-M':6, 
         'SSETI EXPRESS (XO-53)':7,
         'DELFI-C3 (DO-64)':2,
         'HOPE-1 (HO-68)':10,
+        'CUBESAT XI-IV (CO-57)':10,
     } 
-
+    print "Sats in range:"
     for tle in tles:
         sat = ephem.readtle(tle[0],tle[1],tle[2])
         try:
@@ -50,4 +51,5 @@ if __name__ == '__main__':
                 sat_data.append((tle[0],math.degrees(sat.alt),math.degrees(sat.az),0))
             print "%s:\t\t %4.1f %5.1f" % (tle[0],math.degrees(sat.alt),math.degrees(sat.az))
     sat_data = sorted(sat_data, key=lambda sat: sat[3], reverse=True)
-    print sat_data
+    print "Best sat in range:"
+    print sat_data[0]
