@@ -3,6 +3,8 @@
 # Rudy Hardeman (Zarya)
 # with tnx to Joseph Armbruster for making the example
 
+__author__ = "Rudy Hardeman (zarya)"
+
 import ephem
 import math
 import os
@@ -50,6 +52,8 @@ if __name__ == '__main__':
             else:
                 sat_data.append((tle[0],math.degrees(sat.alt),math.degrees(sat.az),0))
             print "%s:\t\t %4.1f %5.1f" % (tle[0],math.degrees(sat.alt),math.degrees(sat.az))
+            print "Doppler: %4.4f"%(1 - (sat.range_velocity * 3.6) / 299792)
+            print "Snelheid: %s"%(sat.range_velocity)
     sat_data = sorted(sat_data, key=lambda sat: sat[3], reverse=True)
     print "Best sat in range:"
     print sat_data[0]
