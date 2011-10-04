@@ -61,11 +61,10 @@ def SetMode(mde):
 if __name__ == '__main__':
 
     #Hamlib
-    # Uncomment this line for debug into from hamlib
-    #Hamlib.rig_set_debug (Hamlib.RIG_DEBUG_TRACE)
-
-    # Set for no debug output from hamlib
-    Hamlib.rig_set_debug (Hamlib.RIG_DEBUG_NONE)
+    if _config.get('General','debug'):
+        Hamlib.rig_set_debug (Hamlib.RIG_DEBUG_TRACE)
+    else:
+        Hamlib.rig_set_debug (Hamlib.RIG_DEBUG_NONE)
 
     rig = Hamlib.Rig(_radio)
     try:
@@ -124,8 +123,8 @@ if __name__ == '__main__':
     print "Doppler VFOA: %3.4f %3.4f"%(VFOA_Mhz * (1 - (sat_found[0][4] / 1000) / 299792),1 - sat_found[0][4] / 299792)
     print "Doppler VFOB: %3.4f %3.4f"%(VFOB_Mhz * (1 - (sat_found[0][4] / 1000) / 299792),1 - sat_found[0][4] / 299792)
 
-    VFOA = int(VFOA_Mhz * (1 - (sat_found[0][4] / 1000) / 299792) * 10000)
-    VFOB = int(VFOB_Mhz * (1 - (sat_found[0][4] / 1000) / 299792) * 10000)
+    VFOA = int(VFOA_Mhz * (1 - (sat_found[0][4] / 1000) / 299792) * 1000000)
+    VFOB = int(VFOB_Mhz * (1 - (sat_found[0][4] / 1000) / 299792) * 1000000)
 
     rig.set_vfo(Hamlib.RIG_VFO_A)
     rig.set_freq(VFOA)
