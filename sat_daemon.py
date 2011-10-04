@@ -24,8 +24,7 @@ _config = ConfigParser.ConfigParser()
 _config.readfp(open('sat_daemon.conf'))
 
 _latlong = (_config.get('Location', 'lat'),_config.get('Location', 'lon')) # user lat/long
-#_radio = Hamlib.RIG_MODEL_IC910
-_radio = Hamlib.RIG_MODEL_DUMMY
+_radio = _config.getint('Radio','model') 
 _radioport = _config.get('Radio','port') 
 
 def GetTLEs():
