@@ -7,6 +7,7 @@ __author__ = "Rudy Hardeman (zarya)"
 
 #Private imports
 import rotor
+import debug
 
 #Global imports
 import ephem
@@ -16,16 +17,34 @@ import sys
 import time
 import urllib2
 import ConfigParser
-
-#Hamlib
+from time import sleep
 import Hamlib
 
 _config = ConfigParser.ConfigParser()
-_config.readfp(open('sat_daemon.conf'))
+_config.readfp(open('pytracksat.conf'))
 
 _latlong = (_config.get('Location', 'lat'),_config.get('Location', 'lon')) # user lat/long
 _radio = _config.getint('Radio','model') 
-_radioport = _config.get('Radio','port') 
+_radioport = _config.get('Radio','port')
+
+#Create rotor control object
+Rotor = rotor.Rotor(_config.get('Rotor','port'),_config)
+
+#Create debug object
+Debug = debug.Debug(_config)
+
+#Hamlib
+if not _config.get('Debug','debug'):
+    Hamlib.rig_set_debug (Hamlib.RIG_DEBUG_TRACE)
+else:
+    Hamlib.rig_set_debug (Hamlib.RIG_DEBUG_NONE)
+
+rig = Hamlib.Rig(_radio)
+try:
+    rig.set_conf(_radioport)
+except:
+    pass
+rig.open() 
 
 def GetTLEs():
     #tles = urllib2.urlopen('http://www.amsat.org/amsat/ftp/keps/current/nasabare.txt').readlines()
@@ -56,31 +75,16 @@ def SetMode(mde):
     else:
         return Hamlib.RIG_MODE_AM
 
-
-if __name__ == '__main__':
-
-    #Hamlib
-    if _config.get('General','debug'):
-        Hamlib.rig_set_debug (Hamlib.RIG_DEBUG_TRACE)
-    else:
-        Hamlib.rig_set_debug (Hamlib.RIG_DEBUG_NONE)
-
-    rig = Hamlib.Rig(_radio)
-    try:
-        rig.set_conf(_radioport)
-    except:
-        pass 
-    rig.open()
-    
-
+while True:
     #ephem
     observer = ephem.Observer()
     observer.lat = _latlong[0]
     observer.long = _latlong[1]
     tles = GetTLEs()
-
-    #Create rotor control object
-    Rotor = rotor.Rotor(_config.get('Rotor','port'))
+    
+    #Open webserver data file
+    web = open("%s/%s"%(_config.get("Web",'path'),_config.get("Web",'file')),'w')
+    web.write("Sat,EL,AZ,Upstream,Upstream_Modulation,Downstream,Downstream_Modulation\n")
 
     sat_found = []
     sat_data = GetSatData()
@@ -95,41 +99,47 @@ if __name__ == '__main__':
             if tle[0] in sat_data:
                 sat_found.append([tle[0],math.degrees(sat.alt),math.degrees(sat.az),sat_data[tle[0]][0],sat.range_velocity])
     sat_found = sorted(sat_found, key=lambda sat: sat[3], reverse=True)
+
+    #If no sats are found
     if len(sat_found) == 0:
-        print "NO SATS FOUND"
-        sys.exit()
-    print sat_found[0][0]
-    print "Rotor: %4.1f %5.1f" % (sat_found[0][1],sat_found[0][2])
+        Debug.write("NO SATS FOUND")
+        Rotor.send(_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az'))
+        web.write("None,%03.1F,%03.1F,,,,\n"%(_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az')))
+        sleep(1)
+        continue
+ 
+    Debug.write(sat_found[0][0])
+    Debug.write("Rotor: %4.1f %5.1f" % (sat_found[0][1],sat_found[0][2]))
 
     #Move rotor
     Rotor.send(sat_found[0][1],sat_found[0][2])
 
-    #PROGRAM RADIO
-
+    #Calculate frequentie information
     #VFOA == Upstream
     #VFOB == Downstream
-    
     VFOA = int(sat_data[sat_found[0][0]][3])
     VFOB = int(sat_data[sat_found[0][0]][1])
-
-    #Dopler calculation
     VFOA_Mhz = float(VFOA)/10000
     VFOB_Mhz = float(VFOB)/10000
+    VFOA_Dopler = VFOA_Mhz * (1 - (sat_found[0][4] / 1000) / 299792)
+    VFOB_Dopler = VFOB_Mhz * (1 - (sat_found[0][4] / 1000) / 299792)
 
-    print "Snelheid: %s"%(sat_found[0][4] / 1000)
-    print "Org. Upstream: %3.4f"%(float(VFOA)/10000)
-    print "Org. Downstream: %3.4f"%(float(VFOB)/10000)
-    print "Doppler VFOA: %3.4f %3.4f"%(VFOA_Mhz * (1 - (sat_found[0][4] / 1000) / 299792),1 - sat_found[0][4] / 299792)
-    print "Doppler VFOB: %3.4f %3.4f"%(VFOB_Mhz * (1 - (sat_found[0][4] / 1000) / 299792),1 - sat_found[0][4] / 299792)
-
-    VFOA = int(VFOA_Mhz * (1 - (sat_found[0][4] / 1000) / 299792) * 1000000)
-    VFOB = int(VFOB_Mhz * (1 - (sat_found[0][4] / 1000) / 299792) * 1000000)
+    Debug.write("Snelheid: %s"%(sat_found[0][4] / 1000))
+    Debug.write("Org. Upstream: %3.4f"%(float(VFOA)/10000))
+    Debug.write("Org. Downstream: %3.4f"%(float(VFOB)/10000))
+    Debug.write("Doppler VFOA: %3.4f %3.4f"%(VFOA_Dopler,1 - sat_found[0][4] / 299792))
+    Debug.write("Doppler VFOB: %3.4f %3.4f"%(VFOB_Dopler,1 - sat_found[0][4] / 299792))
+    
+    #Write sat data to webserver file
+    web.write("%s,%03.1F,%03.1F,%3.4f,%s,%3.4f,%s\n"%\
+        (sat_found[0][0],sat_found[0][1],sat_found[0][2],\
+        VFOA_Dopler,sat_data[sat_found[0][0]][4],\
+        VFOB_Dopler,sat_data[sat_found[0][0]][2]))
 
     rig.set_vfo(Hamlib.RIG_VFO_A)
-    rig.set_freq(VFOA)
+    rig.set_freq(VFOA_Dopler)
     rig.set_mode(SetMode(sat_data[sat_found[0][0]][4]))
-
     rig.set_vfo(Hamlib.RIG_VFO_B)
-    rig.set_freq(VFOB)
+    rig.set_freq(VFOB_Dopler)
     rig.set_mode(SetMode(sat_data[sat_found[0][0]][2]))
-
+    sleep(1)

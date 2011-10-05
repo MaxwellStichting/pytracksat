@@ -1,8 +1,19 @@
 [General]
-debug=0
+test=1
+
+[Debug]
+debug=1
+file=
+type=Screen
+
+[Web]
+path=.
+file=webdata.txt
 
 [Rotor]
 port=/dev/ttyUSB0
+rest_el=0
+rest_az=90
 
 [Location]
 lat=51.44915
