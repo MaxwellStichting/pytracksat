@@ -113,10 +113,10 @@ while True:
         web.write("None,%03.1F,%03.1F,,,,\n"%(_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az')))
         rig.set_vfo(Hamlib.RIG_VFO_A)
         rig.set_freq(_config.getint('Radio','rest_freq_vfoa'))
-        rig.set_mode(SetMode(_config.get('Radio','rest_modulation_vfoa'))
+        rig.set_mode(SetMode(_config.get('Radio','rest_modulation_vfoa')))
         rig.set_vfo(Hamlib.RIG_VFO_B)
         rig.set_freq(_config.getint('Radio','rest_freq_vfob'))
-        rig.set_mode(SetMode(_config.get('Radio','rest_modulation_vfob'))
+        rig.set_mode(SetMode(_config.get('Radio','rest_modulation_vfob')))
         sleep(1)
         continue
  
