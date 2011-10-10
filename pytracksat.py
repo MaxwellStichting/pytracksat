@@ -111,6 +111,12 @@ while True:
         Debug.write("NO SATS FOUND")
         Rotor.send(_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az'))
         web.write("None,%03.1F,%03.1F,,,,\n"%(_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az')))
+        rig.set_vfo(Hamlib.RIG_VFO_A)
+        rig.set_freq(430000000)
+        rig.set_mode(SetMode('FM'))
+        rig.set_vfo(Hamlib.RIG_VFO_B)
+        rig.set_freq(145000000)
+        rig.set_mode(SetMode('FM'))
         sleep(1)
         continue
  
