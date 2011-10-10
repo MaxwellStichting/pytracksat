@@ -23,6 +23,10 @@ lon=5.48776
 model=1
 port=/dev/ttyS0
 baudrate=9600
+rest_freq_vfoa=430000000
+rest_freq_vfob=145000000
+rest_modulation_vfoa=FM
+rest_modulation_vfob=FM
 
 [Sats]
 keplerfile=nasabare.txt
