@@ -46,7 +46,8 @@ else:
 
 rig = Hamlib.Rig(_radio)
 try:
-    rig.set_conf(_radioport)
+    rig.set_conf('rig_port,'_radioport)
+    rig.set_conf('rig_baudrate',_config.get('Radio','baudrate'))
 except:
     pass
 rig.open() 

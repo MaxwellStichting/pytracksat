@@ -22,6 +22,7 @@ lon=5.48776
 [Radio]
 model=1
 port=/dev/ttyS0
+baudrate=9600
 
 [Sats]
 keplerfile=nasabare.txt
