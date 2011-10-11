@@ -20,7 +20,7 @@ class Rotor:
         self.el = 0
  
     def send(self,az,el):
-        if el > 98.9:
+        if el > 89.9:
             return
         if self.az != "%03F" % az or self.el != "%03F" % el:
             if not self._config.getboolean('General','test'):

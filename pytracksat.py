@@ -105,7 +105,7 @@ while True:
         except:
             continue
         sat.compute(observer)
-        if math.degrees(sat.alt) > 0 and math.degrees(sat.az) > 0 and math.degrees(sat.alt) < 90:
+        if math.degrees(sat.alt) > 0 and math.degrees(sat.az) > 0 and math.degrees(sat.alt) < 180:
             if tle[0] in sat_data:
                 sat_found.append([tle[0],math.degrees(sat.alt),math.degrees(sat.az),sat_data[tle[0]][0],sat.range_velocity])
     sat_found = sorted(sat_found, key=lambda sat: sat[3], reverse=True)
