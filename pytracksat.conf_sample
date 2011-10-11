@@ -20,6 +20,7 @@ lat=51.44915
 lon=5.48776
 
 [Radio]
+debug=0
 model=1
 port=/dev/ttyS0
 baudrate=9600

@@ -40,7 +40,7 @@ Rotor = rotor.Rotor(_config.get('Rotor','port'),_config)
 Debug = debug.Debug(_config)
 
 #Hamlib
-if _config.getboolean('Debug','debug'):
+if _config.getboolean('Radio','debug'):
     Hamlib.rig_set_debug (Hamlib.RIG_DEBUG_TRACE)
 else:
     Hamlib.rig_set_debug (Hamlib.RIG_DEBUG_NONE)
