@@ -105,7 +105,7 @@ while True:
         except:
             continue
         sat.compute(observer)
-        if math.degrees(sat.alt) > 0 and math.degrees(sat.az) > 0:
+        if math.degrees(sat.alt) > 0 and math.degrees(sat.az) > 0 and math.degrees(sat.alt) < 90:
             if tle[0] in sat_data:
                 sat_found.append([tle[0],math.degrees(sat.alt),math.degrees(sat.az),sat_data[tle[0]][0],sat.range_velocity])
     sat_found = sorted(sat_found, key=lambda sat: sat[3], reverse=True)
@@ -113,7 +113,7 @@ while True:
     #If no sats are found
     if len(sat_found) == 0:
         Debug.write("NO SATS FOUND")
-        Rotor.send(_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az'))
+        Rotor.send(_config.getint('Rotor','rest_az'),_config.getint('Rotor','rest_el'))
         web.write("None,%03.1F,%03.1F,,,,\n"%(_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az')))
         rig.set_vfo(Hamlib.RIG_VFO_MAIN)
         rig.set_freq(_config.getint('Radio','rest_freq_vfoa'))

@@ -20,11 +20,13 @@ class Rotor:
         self.el = 0
  
     def send(self,az,el):
-        if self.az != "%03.1F" % az or self.el != "%03.1F" % el:
+        if el > 98.9:
+            return
+        if self.az != "%03F" % az or self.el != "%03F" % el:
             if not self._config.getboolean('General','test'):
                 self.ser.write("AZ%03.1F EL%03.1f\n"%(az,el))
             else:
                 print "Rotor: AZ%03.1F EL%03.1f"%(az,el)
-            self.az = "%03.1F" % az
-            self.el = "%03.1F" % el
+            self.az = "%03F" % az
+            self.el = "%03F" % el
 
