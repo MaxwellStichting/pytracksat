@@ -39,7 +39,7 @@ Rotor = rotor.Rotor(_config.get('Rotor','port'),_config)
 Debug = debug.Debug(_config)
 
 #Hamlib
-if not _config.get('Debug','debug'):
+if _config.getboolean('Debug','debug'):
     Hamlib.rig_set_debug (Hamlib.RIG_DEBUG_TRACE)
 else:
     Hamlib.rig_set_debug (Hamlib.RIG_DEBUG_NONE)
@@ -130,10 +130,11 @@ while True:
     #VFOA == Upstream
     #VFOB == Downstream
     VFOA = int(sat_data[sat_found[0][0]][3])
-    VFOB = int(sat_data[sat_found[0][0]][1])
     VFOA_Mhz = float(VFOA)/10000
-    VFOB_Mhz = float(VFOB)/10000
     VFOA_Dopler = VFOA_Mhz * (1 - (sat_found[0][4] / 1000) / 299792)
+
+    VFOB = int(sat_data[sat_found[0][0]][1])
+    VFOB_Mhz = float(VFOB)/10000
     VFOB_Dopler = VFOB_Mhz * (1 - (sat_found[0][4] / 1000) / 299792)
 
     Debug.write("Snelheid: %s"%(sat_found[0][4] / 1000))
@@ -148,9 +149,10 @@ while True:
         VFOA_Dopler,sat_data[sat_found[0][0]][4],\
         VFOB_Dopler,sat_data[sat_found[0][0]][2]))
 
-    rig.set_vfo(Hamlib.RIG_VFO_A)
-    rig.set_freq(VFOA_Dopler)
-    rig.set_mode(SetMode(sat_data[sat_found[0][0]][4]))
+    if int(sat_data[sat_found[0][0]][3]) != 0:
+        rig.set_vfo(Hamlib.RIG_VFO_A)
+        rig.set_freq(VFOA_Dopler)
+        rig.set_mode(SetMode(sat_data[sat_found[0][0]][4]))
     rig.set_vfo(Hamlib.RIG_VFO_B)
     rig.set_freq(VFOB_Dopler)
     rig.set_mode(SetMode(sat_data[sat_found[0][0]][2]))
