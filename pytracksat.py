@@ -31,6 +31,7 @@ _config.readfp(open('pytracksat.conf'))
 _latlong = (_config.get('Location', 'lat'),_config.get('Location', 'lon')) # user lat/long
 _radio = _config.getint('Radio','model') 
 _radioport = _config.get('Radio','port')
+_civaddr = _config.get('Radio','civaddr')
 
 #Create rotor control object
 Rotor = rotor.Rotor(_config.get('Rotor','port'),_config)
@@ -50,6 +51,9 @@ try:
     rig.set_conf('rig_baudrate',_config.get('Radio','baudrate'))
 except:
     pass
+
+if _config.get('Radio','civaddr') != 0:
+    rig.set_conf('rig_civaddr',_config.get('Radio','civaddr'))
 rig.open() 
 
 def GetTLEs():
@@ -111,12 +115,12 @@ while True:
         Debug.write("NO SATS FOUND")
         Rotor.send(_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az'))
         web.write("None,%03.1F,%03.1F,,,,\n"%(_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az')))
-        rig.set_vfo(Hamlib.RIG_VFO_A)
+        rig.set_vfo(Hamlib.RIG_VFO_MAIN)
         rig.set_freq(_config.getint('Radio','rest_freq_vfoa'))
-        rig.set_mode(SetMode(_config.get('Radio','rest_modulation_vfoa')))
-        rig.set_vfo(Hamlib.RIG_VFO_B)
+        rig.set_mode(SetMode(_config.get('Radio','rest_modulation_vfoa'),2300))
+        rig.set_vfo(Hamlib.RIG_VFO_SUB)
         rig.set_freq(_config.getint('Radio','rest_freq_vfob'))
-        rig.set_mode(SetMode(_config.get('Radio','rest_modulation_vfob')))
+        rig.set_mode(SetMode(_config.get('Radio','rest_modulation_vfob'),2300))
         sleep(1)
         continue
  
@@ -127,8 +131,8 @@ while True:
     Rotor.send(sat_found[0][1],sat_found[0][2])
 
     #Calculate frequentie information
-    #VFOA == Upstream
-    #VFOB == Downstream
+    #VFOA == Upstream (MAIN)
+    #VFOB == Downstream (SUB)
     VFOA = int(sat_data[sat_found[0][0]][3])
     VFOA_Mhz = float(VFOA)/10000
     VFOA_Dopler = VFOA_Mhz * (1 - (sat_found[0][4] / 1000) / 299792)
@@ -150,10 +154,10 @@ while True:
         VFOB_Dopler,sat_data[sat_found[0][0]][2]))
 
     if int(sat_data[sat_found[0][0]][3]) != 0:
-        rig.set_vfo(Hamlib.RIG_VFO_A)
+        rig.set_vfo(Hamlib.RIG_VFO_MAIN)
         rig.set_freq(VFOA_Dopler)
         rig.set_mode(SetMode(sat_data[sat_found[0][0]][4]))
-    rig.set_vfo(Hamlib.RIG_VFO_B)
+    rig.set_vfo(Hamlib.RIG_VFO_SUB)
     rig.set_freq(VFOB_Dopler)
     rig.set_mode(SetMode(sat_data[sat_found[0][0]][2]))
     sleep(1)

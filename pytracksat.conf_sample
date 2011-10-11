@@ -27,6 +27,7 @@ rest_freq_vfoa=430000000
 rest_freq_vfob=145000000
 rest_modulation_vfoa=FM
 rest_modulation_vfob=FM
+civaddr=0
 
 [Sats]
 keplerfile=nasabare.txt
