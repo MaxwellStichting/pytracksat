@@ -16,10 +16,15 @@ class Rotor:
     def __init__(self,port,_config):
         self.ser = serial.Serial(port, 9600, timeout=1) 
         self._config = _config
+        self.az = 0
+        self.el = 0
  
     def send(self,az,el):
-        if not self._config.getboolean('General','test'):
-            self.ser.write("AZ%03.1F EL%03.1f\n"%(az,el))
-        else:
-            print "Rotor: AZ%03.1F EL%03.1f"%(az,el)
+        if self.az != "%03.1F" % az or self.el != "%03.1F" % el:
+            if not self._config.getboolean('General','test'):
+                self.ser.write("AZ%03.1F EL%03.1f\n"%(az,el))
+            else:
+                print "Rotor: AZ%03.1F EL%03.1f"%(az,el)
+            self.az = "%03.1F" % az
+            self.el = "%03.1F" % el
 
