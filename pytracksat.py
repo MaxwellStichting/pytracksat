@@ -163,6 +163,7 @@ while True:
         (sat_found[0][0],sat_found[0][1],sat_found[0][2],\
         VFOA_Dopler,sat_data[sat_found[0][0]][4],\
         VFOB_Dopler,sat_data[sat_found[0][0]][2]))
+    web.close()
 
     if int(sat_data[sat_found[0][0]][3]) != 0:
         rig.set_vfo(Hamlib.RIG_VFO_MAIN)
