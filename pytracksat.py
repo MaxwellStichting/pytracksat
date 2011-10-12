@@ -168,10 +168,6 @@ while True:
         rig.set_vfo(Hamlib.RIG_VFO_MAIN)
         rig.set_freq(int(VFOA_Dopler*1000000))
         rig.set_mode(SetMode(sat_data[sat_found[0][0]][4]))
-    else:
-        rig.set_vfo(Hamlib.RIG_VFO_MAIN)
-        rig.set_freq(int(VFOB_Dopler*1000000))
-        rig.set_mode(SetMode(sat_data[sat_found[0][0]][2]))
     #430100000 437.2758722214
     rig.set_vfo(Hamlib.RIG_VFO_SUB)
     rig.set_freq(int(VFOB_Dopler*1000000))
