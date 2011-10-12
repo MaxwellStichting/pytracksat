@@ -22,7 +22,7 @@ class Rotor:
     def send(self,az,el):
         if el > 89.9:
             return
-        if self.az != "%03F" % az or self.el != "%03F" % el:
+        if abs(float(self.az) - float(az)) > 4 or abs(float(self.el) - float(el)) > 1:
             if not self._config.getboolean('General','test'):
                 self.ser.write("AZ%03.1F EL%03.1f\n"%(az,el))
             else:
