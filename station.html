@@ -34,6 +34,7 @@ function draw(elevation, azimuth) {
 	var canvas = document.getElementById('canvas');
 	var context = canvas.getContext('2d');
 
+	/* Clear the canvas */
 	context.fillStyle = '#000';
 	context.fillRect(0,0,150,150);
 
@@ -41,6 +42,7 @@ function draw(elevation, azimuth) {
 	context.fillStyle = '#0f0';
 	context.lineWidth = .3;
 
+	/* Draw the radar map */
 	context.beginPath();
 	context.moveTo(0,75);
 	context.lineTo(150,75);
@@ -57,7 +59,7 @@ function draw(elevation, azimuth) {
 	context.stroke();
 	context.closePath();
 
-	/* Draw the previous positions */
+	/* Plot the previous positions line */
 	context.strokeStyle = 'gold';
 	context.lineWidth = .8;
 	context.beginPath();
@@ -76,7 +78,7 @@ function draw(elevation, azimuth) {
 	context.closePath();
 	
 
-	
+	/* Draw the current position dot */
 	var outward_pos = 75 - (elevation / 90 * 75);
 	var radials = azimuth / 180 * Math.PI;
 	var x = 75 + Math.sin(radials) * outward_pos;
@@ -90,6 +92,7 @@ function draw(elevation, azimuth) {
 	context.fill();
 	context.closePath();
 }
+
 function get_handler() {
 	if (this.readyState != 4 || this.status != 200) {
 		return false;
@@ -105,16 +108,26 @@ function get_handler() {
 		document.getElementById('elevation').innerHTML = Number(data[1]).toFixed(1);
 		document.getElementById('azimuth').innerHTML = Number(data[2]).toFixed(1);
 		document.getElementById('uplink').innerHTML = Number(data[3]).toFixed(3);
+		document.getElementById('uplink_modulation').innerHTML = data[4];
 		document.getElementById('downlink').innerHTML = Number(data[5]).toFixed(3);
+		document.getElementById('downlink_modulation').innerHTML = data[6];
 
 		break;
 	}
+
+	/* If we have a new sat, clear the old data */
 	if (prev_sat != data[0]) {
 		prev_positions = [];
 		prev_sat = data[0];
 	}
+
 	draw(Number(data[1]), Number(data[2]));
-	prev_positions.push([ Number(data[1]), Number(data[2]) ]);
+	
+	/* Add the position for plotting, but only if it's not identical to the previous position */
+	if (prev_positions[prev_positions.length-1][0] == Number(data[1]) &&
+			prev_positions[prev_positions.length-1][1] == Number(data[2])) {
+		prev_positions.push([ Number(data[1]), Number(data[2]) ]);
+	}
 }
 
 function head_handler() {
@@ -150,13 +163,13 @@ window.onload = function() {
 </script>
 <body>
 <table class="station_info">
-<tr><td class="field">Sat</td><td class="data" id="sat"></td><td rowspan="6"><canvas id="canvas" height="150" width="150">
+<tr><td class="field">Sat</td><td class="data" id="sat"></td><td></td><td rowspan="6"><canvas id="canvas" height="150" width="150">
 No HTML5 canvas<br/>
 in your browser.
 </canvas></td></tr>
-<tr><td class="field">Uplink</td><td class="data" id="uplink"></td></tr>
-<tr><td class="field">Downlink</td><td class="data" id="downlink"></td></tr>
-<tr><td class="field">Elevation</td><td class="data" id="elevation"></td></tr>
-<tr><td class="field">Azimuth</td><td class="data" id="azimuth"></td></tr>
-<tr><td class="filler"></td><td class="filler"></td></tr>
+<tr><td class="field">Uplink</td><td class="data" id="uplink"></td><td class="data" id="uplink_modulation"></td></tr>
+<tr><td class="field">Downlink</td><td class="data" id="downlink"></td><td class="data" id="downlink_modulation"></td></tr>
+<tr><td class="field">Elevation</td><td class="data" id="elevation"></td><td></td></tr>
+<tr><td class="field">Azimuth</td><td class="data" id="azimuth"></td><td></td></tr>
+<tr><td class="filler"></td><td class="filler"></td><td class="filler"></td></tr>
 
