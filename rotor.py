@@ -25,8 +25,8 @@ class Rotor:
         if abs(float(self.az) - float(az)) > 4 or abs(float(self.el) - float(el)) > 1:
             if not self._config.getboolean('General','test'):
                 self.ser.write("AZ%03.1F EL%03.1f\n"%(az,el))
-            else:
-                print "Rotor: AZ: %03.1F EL: %03.1f"%(az,el)
+            if self._config.getboolean('Debug','debug'):
+                print "Moving rotor to: AZ: %03.1F EL: %03.1f"%(az,el)
             self.az = "%03F" % az
             self.el = "%03F" % el
 
