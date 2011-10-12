@@ -1,0 +1,162 @@
+<!doctype html>
+<!--
+  Station monitor
+  Copyright (C) 2011 Wilco Baan Hofman
+
+-->
+<html>
+<head>
+<title>Station</title>
+<style type="text/css">
+.field {
+	color: lightgreen;
+}
+.data {
+	color: gold;
+	text-align: right;
+}
+.station_info {
+	border-collapse: collapse;
+	background-color: black;
+}
+.station_info td {
+	border: 1px solid gray;
+}
+.filler {
+	height: auto;
+}
+</style>
+<script>
+var cached_etag = '';
+var prev_sat = '';
+var prev_positions = [];
+function draw(elevation, azimuth) {
+	var canvas = document.getElementById('canvas');
+	var context = canvas.getContext('2d');
+
+	context.fillStyle = '#000';
+	context.fillRect(0,0,150,150);
+
+	context.strokeStyle = '#0f0';
+	context.fillStyle = '#0f0';
+	context.lineWidth = .3;
+
+	context.beginPath();
+	context.moveTo(0,75);
+	context.lineTo(150,75);
+	context.moveTo(75,0);
+	context.lineTo(75,150);
+	context.moveTo(75,75);
+	context.arc(75,75,75,0,Math.PI*2,true);
+	context.arc(75,75,65,0,Math.PI*2,true);
+	context.arc(75,75,55,0,Math.PI*2,true);
+	context.arc(75,75,45,0,Math.PI*2,true);
+	context.arc(75,75,35,0,Math.PI*2,true);
+	context.arc(75,75,25,0,Math.PI*2,true);
+	context.arc(75,75,15,0,Math.PI*2,true);
+	context.stroke();
+	context.closePath();
+
+	/* Draw the previous positions */
+	context.strokeStyle = 'gold';
+	context.lineWidth = .8;
+	context.beginPath();
+	for (i = 0; i < prev_positions.length; i++) {
+		var outward_pos = 75 - (prev_positions[i][0] / 90 * 75);
+		var radials = prev_positions[i][1] / 180 * Math.PI;
+		var x = 75 + Math.sin(radials) * outward_pos;
+		var y = 75 - Math.cos(radials) * outward_pos;
+		if (i == 0) {
+			context.moveTo(x, y);
+		} else {
+			context.lineTo(x, y);
+		}
+	}
+	context.stroke();
+	context.closePath();
+	
+
+	
+	var outward_pos = 75 - (elevation / 90 * 75);
+	var radials = azimuth / 180 * Math.PI;
+	var x = 75 + Math.sin(radials) * outward_pos;
+	var y = 75 - Math.cos(radials) * outward_pos;
+
+	context.strokeStyle = 'gold';
+	context.fillStyle = 'gold';
+	context.beginPath();
+	context.arc(x,y,2,0,Math.PI*2,true);
+	context.stroke();
+	context.fill();
+	context.closePath();
+}
+function get_handler() {
+	if (this.readyState != 4 || this.status != 200) {
+		return false;
+	}
+	var response = this.responseText;
+	lines = response.split("\n");
+
+	var data;	
+	for (i = 1; i < lines.length; i++) {
+		data = lines[i].split(",");
+
+		document.getElementById('sat').innerHTML = data[0];
+		document.getElementById('elevation').innerHTML = Number(data[1]).toFixed(1);
+		document.getElementById('azimuth').innerHTML = Number(data[2]).toFixed(1);
+		document.getElementById('uplink').innerHTML = Number(data[3]).toFixed(3);
+		document.getElementById('downlink').innerHTML = Number(data[5]).toFixed(3);
+
+		break;
+	}
+	if (prev_sat != data[0]) {
+		prev_positions = [];
+		prev_sat = data[0];
+	}
+	draw(Number(data[1]), Number(data[2]));
+	prev_positions.push([ Number(data[1]), Number(data[2]) ]);
+}
+
+function head_handler() {
+	if (this.readyState != 4 || this.status != 200) {
+		return false;
+	}
+
+	/* Compare the etag with the previously requested etag, get the file if it's changed. */
+	var etag = this.getResponseHeader('Etag');
+	if (etag != cached_etag) {
+		cached_etag = etag;
+		
+		var client = new XMLHttpRequest();
+		client.onreadystatechange = get_handler;
+		client.open("GET", "webdata.txt");
+		client.setRequestHeader('Cache-Control', 'no-cache');
+		client.send();
+	}
+}
+
+/* Keep doing HEAD requests every second to see if our data has changed. */
+function update_data() {
+	var client = new XMLHttpRequest();
+	client.onreadystatechange = head_handler;
+	client.open("HEAD", "webdata.txt");
+	client.send();
+	setTimeout(update_data, 1000);
+}
+
+window.onload = function() {
+	update_data();
+}	
+</script>
+<body>
+<table class="station_info">
+<tr><td class="field">Sat</td><td class="data" id="sat"></td><td rowspan="6"><canvas id="canvas" height="150" width="150">
+No HTML5 canvas<br/>
+in your browser.
+</canvas></td></tr>
+<tr><td class="field">Uplink</td><td class="data" id="uplink"></td></tr>
+<tr><td class="field">Downlink</td><td class="data" id="downlink"></td></tr>
+<tr><td class="field">Elevation</td><td class="data" id="elevation"></td></tr>
+<tr><td class="field">Azimuth</td><td class="data" id="azimuth"></td></tr>
+<tr><td class="filler"></td><td class="filler"></td></tr>
+
