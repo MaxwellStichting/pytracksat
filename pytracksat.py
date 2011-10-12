@@ -125,10 +125,10 @@ while True:
         continue
  
     Debug.write(sat_found[0][0])
-    Debug.write("Rotor: %4.1f %5.1f" % (sat_found[0][1],sat_found[0][2]))
+    Debug.write("Rotor: AZ: %03.1f EL: %03.1f" % (sat_found[0][2],sat_found[0][1]))
 
     #Move rotor
-    Rotor.send(sat_found[0][1],sat_found[0][2])
+    Rotor.send(sat_found[0][2],sat_found[0][1])
 
     #Calculate frequentie information
     #VFOA == Upstream (MAIN)

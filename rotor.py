@@ -26,7 +26,7 @@ class Rotor:
             if not self._config.getboolean('General','test'):
                 self.ser.write("AZ%03.1F EL%03.1f\n"%(az,el))
             else:
-                print "Rotor: AZ%03.1F EL%03.1f"%(az,el)
+                print "Rotor: AZ: %03.1F EL: %03.1f"%(az,el)
             self.az = "%03F" % az
             self.el = "%03F" % el
 
