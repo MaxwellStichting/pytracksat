@@ -14,6 +14,8 @@ file=webdata.txt
 port=/dev/ttyUSB0
 rest_el=0
 rest_az=90
+margin_az=4
+margin_el=1
 
 [Location]
 lat=51.44915
