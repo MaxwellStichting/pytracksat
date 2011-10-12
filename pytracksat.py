@@ -55,6 +55,16 @@ except:
 if _config.get('Radio','civaddr') != 0:
     rig.set_conf('rig_civaddr',_config.get('Radio','civaddr'))
 rig.open() 
+#INIT RIG
+rig.set_vfo(Hamlib.RIG_VFO_MAIN)
+rig.set_vfo(Hamlib.RIG_VFO_B)
+rig.set_freq(_config.getint('Radio','rest_freq_vfoa'))
+rig.set_mode(SetMode(_config.get('Radio','rest_modulation_vfoa')))
+rig.set_vfo(Hamlib.RIG_VFO_SUB)
+rig.set_vfo(Hamlib.RIG_VFO_A)
+rig.set_freq(_config.getint('Radio','rest_freq_vfob'))
+rig.set_mode(SetMode(_config.get('Radio','rest_modulation_vfob')))
+
 
 def GetTLEs():
     #tles = urllib2.urlopen('http://www.amsat.org/amsat/ftp/keps/current/nasabare.txt').readlines()
