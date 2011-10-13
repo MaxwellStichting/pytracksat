@@ -140,7 +140,7 @@ while True:
     if len(sat_found) == 0:
         Debug.write("NO SATS FOUND")
         Rotor.send(_config.getint('Rotor','rest_az'),_config.getint('Rotor','rest_el'))
-        WriteWebfile("None,,%03.1F,%03.1F,%3.4f,%s,%3.4f,%s\n"%
+        WriteWebfile("None,%03.1F,%03.1F,%3.4f,%s,%3.4f,%s\n"%
             (_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az'),
             _config.getint('Radio','rest_freq_vfoa'),
             _config.get('Radio','rest_modulation_vfoa'),
