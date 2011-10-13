@@ -140,7 +140,12 @@ while True:
     if len(sat_found) == 0:
         Debug.write("NO SATS FOUND")
         Rotor.send(_config.getint('Rotor','rest_az'),_config.getint('Rotor','rest_el'))
-        WriteWebfile("None,%03.1F,%03.1F,,,,\n"%(_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az')))
+        WriteWebfile("None,,%03.1F,%03.1F,%3.4f,%s,%3.4f,%s\n"%
+            (_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az'),
+            _config.getint('Radio','rest_freq_vfoa'),
+            _config.get('Radio','rest_modulation_vfoa'),
+            _config.getint('Radio','rest_freq_vfob'),
+            _config.get('Radio','rest_modulation_vfob')))
         rig.set_vfo(Hamlib.RIG_VFO_MAIN)
         rig.set_freq(_config.getint('Radio','rest_freq_vfoa'))
         rig.set_mode(SetMode(_config.get('Radio','rest_modulation_vfoa')))
