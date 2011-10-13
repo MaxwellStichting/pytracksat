@@ -126,9 +126,11 @@ function get_handler() {
 	/* Add the position for plotting, but only if it's not identical to the previous position */
 	if (prev_positions.length > 0 &&
 			prev_positions[prev_positions.length-1][0] == Number(data[1]) &&
-			prev_positions[prev_positions.length-1][1] == Number(data[2])) {
-		prev_positions.push([ Number(data[1]), Number(data[2]) ]);
+			prev_positions[prev_positions.length-1][1] == Number(data[2]))) {
+		return true;
 	}
+	prev_positions.push([ Number(data[1]), Number(data[2]) ]);
+	return true;
 }
 
 function head_handler() {
