@@ -97,6 +97,8 @@ function get_handler() {
 	if (this.readyState != 4 || this.status != 200) {
 		return false;
 	}
+	cached_etag = this.getResponseHeader('Etag');
+
 	var response = this.responseText;
 	lines = response.split("\n");
 
@@ -133,29 +135,13 @@ function get_handler() {
 	return true;
 }
 
-function head_handler() {
-	if (this.readyState != 4 || this.status != 200) {
-		return false;
-	}
-
-	/* Compare the etag with the previously requested etag, get the file if it's changed. */
-	var etag = this.getResponseHeader('Etag');
-	if (etag != cached_etag) {
-		cached_etag = etag;
-		
-		var client = new XMLHttpRequest();
-		client.onreadystatechange = get_handler;
-		client.open("GET", "webdata.txt");
-		client.setRequestHeader('Cache-Control', 'no-cache');
-		client.send();
-	}
-}
-
-/* Keep doing HEAD requests every second to see if our data has changed. */
+/* Keep doing GET requests every second to see if our data has changed. */
 function update_data() {
 	var client = new XMLHttpRequest();
-	client.onreadystatechange = head_handler;
-	client.open("HEAD", "webdata.txt");
+	client.onreadystatechange = get_handler;
+	client.open("GET", "webdata.txt");
+	client.setRequestHeader('Cache-Control', 'no-cache');
+	client.setRequestHeader('If-None-Match', cached_etag);
 	client.send();
 	setTimeout(update_data, 1000);
 }
