@@ -85,6 +85,25 @@ def SetMode(mde):
     else:
         return Hamlib.RIG_MODE_AM
 
+prev_string = ''
+
+def WriteWebfile(string):
+    global prev_string
+
+    # Do not write the same data twice
+    if string == prev_string:
+    	return
+
+    #Open webserver data file
+    web_filename = "%s/%s" % (_config.get("Web",'path'), _config.get("Web",'file'))
+    web = open("%s.tmp" % web_filename, 'w')
+    web.write("Sat,EL,AZ,Upstream,Upstream_Modulation,Downstream,Downstream_Modulation\n")
+    web.write(string)
+    web.close()
+    os.rename("%s.tmp" % web_filename, web_filename)
+
+    prev_string = string
+
 #INIT RIG
 rig.set_vfo(Hamlib.RIG_VFO_MAIN)
 rig.set_vfo(Hamlib.RIG_VFO_B)
@@ -102,10 +121,6 @@ while True:
     observer.lat = _latlong[0]
     observer.long = _latlong[1]
     tles = GetTLEs()
-    
-    #Open webserver data file
-    web = open("%s/%s"%(_config.get("Web",'path'),_config.get("Web",'file')),'w')
-    web.write("Sat,EL,AZ,Upstream,Upstream_Modulation,Downstream,Downstream_Modulation\n")
 
     sat_found = []
     sat_data = GetSatData()
@@ -125,7 +140,7 @@ while True:
     if len(sat_found) == 0:
         Debug.write("NO SATS FOUND")
         Rotor.send(_config.getint('Rotor','rest_az'),_config.getint('Rotor','rest_el'))
-        web.write("None,%03.1F,%03.1F,,,,\n"%(_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az')))
+        WriteWebfile("None,%03.1F,%03.1F,,,,\n"%(_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az')))
         rig.set_vfo(Hamlib.RIG_VFO_MAIN)
         rig.set_freq(_config.getint('Radio','rest_freq_vfoa'))
         rig.set_mode(SetMode(_config.get('Radio','rest_modulation_vfoa')))
@@ -159,11 +174,10 @@ while True:
     Debug.write("Doppler VFOB: %3.4f %3.4f"%(VFOB_Dopler,1 - sat_found[0][4] / 299792))
     
     #Write sat data to webserver file
-    web.write("%s,%03.1F,%03.1F,%3.4f,%s,%3.4f,%s\n"%\
+    WriteWebfile("%s,%03.1F,%03.1F,%3.4f,%s,%3.4f,%s\n"%\
         (sat_found[0][0],sat_found[0][1],sat_found[0][2],\
         VFOA_Dopler,sat_data[sat_found[0][0]][4],\
         VFOB_Dopler,sat_data[sat_found[0][0]][2]))
-    web.close()
 
     if int(sat_data[sat_found[0][0]][3]) != 0:
         rig.set_vfo(Hamlib.RIG_VFO_MAIN)
