@@ -58,9 +58,11 @@ rig.open()
 
 def GetTLEs():
     #tles = urllib2.urlopen('http://www.amsat.org/amsat/ftp/keps/current/nasabare.txt').readlines()
-    tles = open(_config.get('Sats','keplerfile'), 'r').readlines()
+    file = open(_config.get('Sats','keplerfile'), 'r')
+    tles = file.readlines()
     tles = [item.strip() for item in tles]
     tles = [tles[i:i+3] for i in xrange(0,len(tles)-2,3)]
+    file.close()
     return tles
 
 def GetSatData():
