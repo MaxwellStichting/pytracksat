@@ -71,6 +71,7 @@ def GetSatData():
         sat = sat.split(',')
         if sat[0] != "SAT":
             sat_data[sat[0]]=[sat[1],sat[2],sat[3],sat[4],sat[5]]
+    sats.close()
     return sat_data        
 
 def SetMode(mde):
