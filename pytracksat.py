@@ -118,13 +118,11 @@ rig.set_vfo(Hamlib.RIG_VFO_A)
 rig.set_freq(_config.getint('Radio','rest_freq_vfob'))
 rig.set_mode(SetMode(_config.get('Radio','rest_modulation_vfob')))
 
-observer = ephem.Observer()
-observer.lat = _latlong[0]
-observer.long = _latlong[1]
-
-
-
 while True:
+    observer = ephem.Observer()
+    observer.lat = _latlong[0]
+    observer.long = _latlong[1]
+    
     tles = GetTLEs()
 
     sat_found = []
