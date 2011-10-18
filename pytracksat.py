@@ -96,6 +96,7 @@ def WriteWebfile(string):
 
     prev_string = string
 
+#Start main program
 if __name__ == '__main__':
     #Read the config file
     _config = ConfigParser.ConfigParser()
@@ -157,14 +158,11 @@ if __name__ == '__main__':
         sat_data = GetSatData()
         for tle in tles:
             sat = ephem.readtle(tle[0],tle[1],tle[2])
-            try:
-                rt, ra, tt, ta, st, sa = observer.next_pass(sat)
-            except:
-                continue
             sat.compute(observer)
             if math.degrees(sat.alt) > 0 and math.degrees(sat.az) > 0 and math.degrees(sat.alt) < 180:
                 if tle[0] in sat_data:
                     sat_found.append([tle[0],math.degrees(sat.alt),math.degrees(sat.az),sat_data[tle[0]][0],sat.range_velocity])
+            del sat
         sat_found = sorted(sat_found, key=lambda sat: sat[3], reverse=True)
     
         #If no sats are found
@@ -196,8 +194,6 @@ if __name__ == '__main__':
         Rotor.send(sat_found[0][2],sat_found[0][1])
     
         #Calculate frequentie information
-        #VFOA == Upstream (MAIN)
-        #VFOB == Downstream (SUB)
         VFOA = int(sat_data[sat_found[0][0]][3])
         VFOA_Mhz = float(VFOA)/10000
         VFOA_Dopler = VFOA_Mhz * (1 - (sat_found[0][4] / 1000) / 299792)
