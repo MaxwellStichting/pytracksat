@@ -20,14 +20,35 @@ import math
 import os
 import sys
 import time
-import urllib2
 import ConfigParser
 from time import sleep
 import Hamlib
+import urllib2
+from datetime import date, timedelta
+
+def UpdateTLEs():
+    basedate = date.today() - timedelta(days=1)
+    try:
+        used = os.stat(_config.get('Sats','keplerfile')).st_mtime
+        year, day, month = time.localtime(used)[:3]
+        lastused = date(year, day, month)
+    except:
+        lastused = date.today() - timedelta(days=2) 
+    if lastused < basedate:
+        tles = urllib2.urlopen(_config.get('Sats','keplerurl')).read()
+        file = open(_config.get('Sats','keplerfile'), 'w')
+        file.write(tles)
+        file.close()
+        return True
+    else:
+        return False
 
 def GetTLEs():
-    #tles = urllib2.urlopen('http://www.amsat.org/amsat/ftp/keps/current/nasabare.txt').readlines()
-    file = open(_config.get('Sats','keplerfile'), 'r')
+    try:
+        file = open(_config.get('Sats','keplerfile'), 'r')
+    except:
+        UpdateTLEs()
+        file = open(_config.get('Sats','keplerfile'), 'r')
     tles = file.readlines()
     tles = [item.strip() for item in tles]
     tles = [tles[i:i+3] for i in xrange(0,len(tles)-2,3)]
@@ -121,13 +142,16 @@ if __name__ == '__main__':
     rig.set_freq(_config.getint('Radio','rest_freq_vfob'))
     rig.set_mode(SetMode(_config.get('Radio','rest_modulation_vfob')))
 
+    #Load TLE's
+    tles = GetTLEs()
 
     while True:
         observer = ephem.Observer()
         observer.lat = _lat
         observer.long = _lon
-        
-        tles = GetTLEs()
+
+        if UpdateTLEs():    
+            tles = GetTLEs()
     
         sat_found = []
         sat_data = GetSatData()
@@ -160,6 +184,8 @@ if __name__ == '__main__':
             rig.set_freq(_config.getint('Radio','rest_freq_vfob'))
             rig.set_mode(SetMode(_config.get('Radio','rest_modulation_vfob')))
             del observer
+            del sat_data
+            del sat_found
             sleep(1)
             continue
      
@@ -203,4 +229,6 @@ if __name__ == '__main__':
         rig.set_freq(int(VFOB_Dopler*1000000))
         rig.set_mode(SetMode(sat_data[sat_found[0][0]][2]))
         del observer
+        del sat_data
+        del sat_found
         sleep(1)

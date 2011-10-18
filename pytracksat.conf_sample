@@ -34,5 +34,5 @@ civaddr=0
 
 [Sats]
 keplerfile=nasabare.txt
-keplerurl=
+keplerurl=http://www.amsat.org/amsat/ftp/keps/current/nasabare.txt
 satdata=satdata.txt
