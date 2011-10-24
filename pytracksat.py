@@ -167,6 +167,8 @@ if __name__ == '__main__':
     
         #If no sats are found
         if len(sat_found) == 0:
+            del Rotor
+            Rotor = rotor.Rotor(_config.get('Rotor','port'),_config)
             Debug.write("NO SATS FOUND")
             Rotor.send(_config.getint('Rotor','rest_az'),_config.getint('Rotor','rest_el'))
             WriteWebfile("None,%03.1F,%03.1F,%3.4f,%s,%3.4f,%s\n"%
@@ -205,8 +207,8 @@ if __name__ == '__main__':
         Debug.write("Snelheid: %s"%(sat_found[0][4] / 1000))
         Debug.write("Org. Upstream: %3.4f"%(float(VFOA)/10000))
         Debug.write("Org. Downstream: %3.4f"%(float(VFOB)/10000))
-        Debug.write("Doppler VFOA: %3.4f %3.4f"%(VFOA_Dopler,1 - sat_found[0][4] / 299792))
-        Debug.write("Doppler VFOB: %3.4f %3.4f"%(VFOB_Dopler,1 - sat_found[0][4] / 299792))
+        Debug.write("Doppler VFOA: %3.8f %3.8f"%(VFOA_Dopler,1 - sat_found[0][4] / 299792))
+        Debug.write("Doppler VFOB: %3.8f %3.8f"%(VFOB_Dopler,1 - sat_found[0][4] / 299792))
         
         #Write sat data to webserver file
         WriteWebfile("%s,%03.1F,%03.1F,%3.4f,%s,%3.4f,%s\n"%\
