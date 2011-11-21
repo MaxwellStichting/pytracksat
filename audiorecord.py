@@ -13,8 +13,36 @@ __author__ = "Rudy Hardeman (zarya,PD0ZRY)"
 import pyaudio
 import wave
 import sys 
+from multiprocessing import Process
+from time import time
 
 class Audio: 
     def __init__(self):
- 
+
+    def start(self,sat):
+        filename = "%s-%s.wav" % (sat,time())
+        self.run = True
+        self.p = Process(target=Wav, args=(self,filename))
+        self.p.start()
+
+    def stop(self):
+        self.run = False
+        self.p.join()
+
+def Wav(audio,filename):
+    p = pyaudio.PyAudio()
+    stream = p.open(format = pyaudio.paInt16,
+        channels = 1,
+        rate = 44100,
+        input = True,
+        frames_per_buffer = 1024)
+    wf.setframerate(44100)wf = wave.open(filename, 'wb')
+    wf.setnchannels(1)
+    wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
+    while audio.run:
+        wf.writeframes(stream.read(1024))
+    stream.close()
+    p.terminate()
+    wf.close()
+    
 
