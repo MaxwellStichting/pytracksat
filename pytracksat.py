@@ -13,6 +13,7 @@ __author__ = "Rudy Hardeman (zarya,PD0ZRY)"
 #Private imports
 import rotor
 import debug
+from audiorecord import Audio
 
 #Global imports
 import ephem
@@ -39,6 +40,7 @@ def UpdateTLEs():
         file = open(_config.get('Sats','keplerfile'), 'w')
         file.write(tles)
         file.close()
+        del file
         return True
     else:
         return False
@@ -53,6 +55,7 @@ def GetTLEs():
     tles = [item.strip() for item in tles]
     tles = [tles[i:i+3] for i in xrange(0,len(tles)-2,3)]
     file.close()
+    del file
     return tles
 
 def GetSatData():
@@ -63,7 +66,7 @@ def GetSatData():
         sat = sat.rstrip()
         sat = sat.split(',')
         if sat[0] != "SAT":
-            sat_data[sat[0]]=[sat[1],sat[2],sat[3],sat[4],sat[5]]
+            sat_data[sat[0]]=[sat[1],sat[2],sat[3],sat[4],sat[5],sat[6]]
     file.close()
     del sats
     del file
@@ -149,12 +152,17 @@ if __name__ == '__main__':
     #Load TLE's
     tles = GetTLEs()
 
+    #Start audio class
+    audio = Audio()
+    current_sat = ""
+
     while True:
         observer = ephem.Observer()
         observer.lat = _lat
         observer.long = _lon
 
-        if UpdateTLEs():    
+        if UpdateTLEs():
+            del tles
             tles = GetTLEs()
     
         sat_found = []
@@ -189,8 +197,14 @@ if __name__ == '__main__':
             del observer
             del sat_data
             del sat_found
+            current_sat = ""
             sleep(1)
             continue
+
+        if (current_sat != sat_found[0][0] and audio.run):
+            audio.stop()
+        if (sat_data[sat_found[0][0]][5] == "yes" and not audio.run):
+            audio.start(sat_found[0][0])
      
         Debug.write(sat_found[0][0])
         Debug.write("Rotor: AZ: %03.1f EL: %03.1f" % (sat_found[0][2],sat_found[0][1]))
@@ -224,7 +238,7 @@ if __name__ == '__main__':
             rig.set_vfo(Hamlib.RIG_VFO_A)
             rig.set_freq(int(VFOA_Dopler*1000000))
             rig.set_mode(SetMode(sat_data[sat_found[0][0]][4]))
-        #430100000 437.2758722214
+
         rig.set_vfo(Hamlib.RIG_VFO_SUB)
         rig.set_vfo(Hamlib.RIG_VFO_B)
         rig.set_freq(int(VFOB_Dopler*1000000))

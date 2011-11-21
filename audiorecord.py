@@ -16,9 +16,10 @@ import sys
 from multiprocessing import Process
 from time import time
 
-class Audio: 
+class Audio:
     def __init__(self):
-
+        self.run = False
+ 
     def start(self,sat):
         filename = "%s-%s.wav" % (sat,time())
         self.run = True
@@ -36,7 +37,8 @@ def Wav(audio,filename):
         rate = 44100,
         input = True,
         frames_per_buffer = 1024)
-    wf.setframerate(44100)wf = wave.open(filename, 'wb')
+    wf = wave.open(filename, 'wb')
+    wf.setframerate(44100)
     wf.setnchannels(1)
     wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
     while audio.run:
