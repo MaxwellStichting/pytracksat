@@ -25,10 +25,10 @@ class Audio:
         self.run = True
         self.p = Process(target=Wav, args=(self,filename))
         self.p.start()
-        self.p.join()
-
     def stop(self):
         self.run = False
+        self.p.join()
+
 
 def Wav(audio,filename):
     p = pyaudio.PyAudio()
