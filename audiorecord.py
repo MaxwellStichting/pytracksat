@@ -29,13 +29,11 @@ class Audio:
         self.p.start()
 
     def stop(self):
-        self.q.put(False)
+        self.q.put("STOP")
         self.p.join()
         sleep(1) 
         self.run = False
         self.q.close()
-        self.q.join()
-        sleep(1)
 
 
 def Wav(audio,filename,q):
@@ -50,7 +48,7 @@ def Wav(audio,filename,q):
     wf.setnchannels(1)
     wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
     run = True
-    while run:
+    while run != "STOP":
         wf.writeframes(stream.read(1024))
         try:
             run = q.get(False)
