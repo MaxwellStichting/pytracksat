@@ -198,6 +198,8 @@ if __name__ == '__main__':
             del sat_data
             del sat_found
             current_sat = ""
+            if (audio.run):
+                audio.stop()
             sleep(1)
             continue
 
