@@ -26,9 +26,10 @@ class Audio:
         self.p = Process(target=Wav, args=(self,filename))
         self.p.daemon = True
         self.p.start()
+
     def stop(self):
-        self.run = False
         self.p.join()
+        self.run = False
 
 
 def Wav(audio,filename):
