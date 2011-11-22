@@ -205,6 +205,7 @@ if __name__ == '__main__':
             audio.stop()
         if (sat_data[sat_found[0][0]][5] == "yes" and not audio.run):
             audio.start(sat_found[0][0])
+            current_sat = sat_found[0][0]
      
         Debug.write(sat_found[0][0])
         Debug.write("Rotor: AZ: %03.1f EL: %03.1f" % (sat_found[0][2],sat_found[0][1]))
