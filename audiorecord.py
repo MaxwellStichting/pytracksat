@@ -25,7 +25,7 @@ class Audio:
         self.q = Queue()
         self.run = True
         self.p = Process(target=Wav, args=(self,filename,self.q))
-        self.p.daemon = True
+        #self.p.daemon = True
         self.p.start()
 
     def stop(self):
