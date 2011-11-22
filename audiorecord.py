@@ -45,7 +45,7 @@ def Wav(audio,filename,q):
     wf.setframerate(44100)
     wf.setnchannels(1)
     wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
-    while q.get() != False:
+    while q.get(False) != False:
         wf.writeframes(stream.read(1024))
     stream.close()
     p.terminate()
