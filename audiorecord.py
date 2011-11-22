@@ -13,7 +13,7 @@ __author__ = "Rudy Hardeman (zarya,PD0ZRY)"
 import pyaudio
 import wave
 import sys 
-from multiprocessing import Process
+from multiprocessing import Process, Queue
 from time import time
 
 class Audio:
@@ -22,17 +22,19 @@ class Audio:
  
     def start(self,sat):
         filename = "%s-%s.wav" % (sat,time())
+        self.q = Queue()
         self.run = True
-        self.p = Process(target=Wav, args=(self,filename))
+        self.p = Process(target=Wav, args=(self,filename,self.q))
         self.p.daemon = True
         self.p.start()
 
     def stop(self):
+        self.q.put(False)
         self.p.join()
         self.run = False
 
 
-def Wav(audio,filename):
+def Wav(audio,filename,q):
     p = pyaudio.PyAudio()
     stream = p.open(format = pyaudio.paInt16,
         channels = 1,
@@ -43,7 +45,7 @@ def Wav(audio,filename):
     wf.setframerate(44100)
     wf.setnchannels(1)
     wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
-    while audio.run:
+    while q.get() != False:
         wf.writeframes(stream.read(1024))
     stream.close()
     p.terminate()
