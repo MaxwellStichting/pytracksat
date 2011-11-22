@@ -32,6 +32,7 @@ class Audio:
         self.q.put(False)
         self.p.join()
         self.run = False
+        self.q.close()
 
 
 def Wav(audio,filename,q):
