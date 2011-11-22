@@ -15,6 +15,7 @@ import wave
 import sys 
 from multiprocessing import Process, Queue
 from time import time, sleep
+import os
 
 class Audio:
     def __init__(self,config):
@@ -22,7 +23,8 @@ class Audio:
         self.config = config
  
     def start(self,sat):
-        filename = "%s%s-%s.wav" % (self.config.get('Recording','path'),sat,time())
+        filename = "%s%s-%s" % (self.config.get('Recording','path'),sat,time())
+        self.filename = filename
         self.q = Queue()
         self.run = True
         self.p = Process(target=Wav, args=(self,filename,self.q))
@@ -35,6 +37,7 @@ class Audio:
         sleep(1) 
         self.run = False
         self.q.close()
+        os.rename("%s" % self.filename, "%s.wav" % self.filename)
         sleep(1)
 
 
