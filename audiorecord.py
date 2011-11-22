@@ -17,11 +17,11 @@ from multiprocessing import Process, Queue
 from time import time, sleep
 
 class Audio:
-    def __init__(self):
+    def __init__(self,config):
         self.run = False
  
     def start(self,sat):
-        filename = "%s-%s.wav" % (sat,time())
+        filename = "%s%s-%s.wav" % (config.get('Recording','path'),sat,time())
         self.q = Queue()
         self.run = True
         self.p = Process(target=Wav, args=(self,filename,self.q))

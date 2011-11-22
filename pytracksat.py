@@ -153,7 +153,7 @@ if __name__ == '__main__':
     tles = GetTLEs()
 
     #Start audio class
-    audio = Audio()
+    audio = Audio(_config)
     current_sat = ""
 
     while True:
