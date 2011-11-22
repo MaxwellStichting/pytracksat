@@ -24,6 +24,7 @@ class Audio:
         filename = "%s-%s.wav" % (sat,time())
         self.run = True
         self.p = Process(target=Wav, args=(self,filename))
+        self.p.daemon = True
         self.p.start()
     def stop(self):
         self.run = False
