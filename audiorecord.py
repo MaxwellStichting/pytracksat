@@ -31,10 +31,11 @@ class Audio:
     def stop(self):
         self.q.put(False)
         self.p.join()
-        time.sleep(1) 
+        sleep(1) 
         self.run = False
         self.q.close()
-        self.q.join_thread()
+        self.q.join()
+        sleep(1)
 
 
 def Wav(audio,filename,q):
