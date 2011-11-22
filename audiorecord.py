@@ -14,7 +14,7 @@ import pyaudio
 import wave
 import sys 
 from multiprocessing import Process, Queue
-from time import time
+from time import time, sleep
 
 class Audio:
     def __init__(self):
@@ -31,6 +31,7 @@ class Audio:
     def stop(self):
         self.q.put(False)
         self.p.join()
+        time.sleep(1) 
         self.run = False
         self.q.close()
         self.q.join_thread()
