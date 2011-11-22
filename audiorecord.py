@@ -34,6 +34,7 @@ class Audio:
         sleep(1) 
         self.run = False
         self.q.close()
+        sleep(1)
 
 
 def Wav(audio,filename,q):
