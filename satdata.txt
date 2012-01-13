@@ -1,5 +1,4 @@
 SAT,prio,downstream,downstream modulation,upstream,upstream modulation,record
-ARISSAT1,100,1459500,FM,0,0,yes
 VO-52,90,1459000,USB,4352250,LSB,yes
 AO-07,80,1459500,USB,4321500,LSB,yes
 ISS,70,1458250,FM,0,0,yes
