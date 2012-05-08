@@ -2,7 +2,7 @@ SAT,prio,downstream,downstream modulation,upstream,upstream modulation,record
 VO-52,90,1459000,USB,4352250,LSB,yes
 RS-39,85,4353150,CW,0,0,no
 AO-07,80,1459500,USB,4321500,LSB,yes
-ISS,70,1458250,FM,0,0,yes
+ISS,70,1458000,FM,0,0,yes
 DO-64,60,1458700,USB,0,0,yes
 CO-66,50,4374850,CW,0,0,yes
 CO-65,40,4372750,CW,0,0,yes
