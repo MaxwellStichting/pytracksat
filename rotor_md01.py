@@ -11,6 +11,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 __author__ = "Rudy Hardeman (zarya,PD0ZRY)"
 
 import serial
+from math import floor
 
 class Rotor:
     def __init__(self,port,_config):
