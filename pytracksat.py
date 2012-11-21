@@ -11,7 +11,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 __author__ = "Rudy Hardeman (zarya,PD0ZRY)"
 
 #Private imports
-import rotor
+#import rotor
+import rotor_md01 as rotor
 import debug
 from audiorecord import Audio
 

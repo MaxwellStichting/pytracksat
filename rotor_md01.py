@@ -15,7 +15,7 @@ from math import floor
 
 class Rotor:
     def __init__(self,port,_config):
-        self.ser = serial.Serial(port, 9600, timeout=1) 
+        self.ser = serial.Serial(port, 115200, timeout=1) 
         self._config = _config
         self.az = 0
         self.el = 0
@@ -24,6 +24,8 @@ class Rotor:
         if el > 89.9:
             return
         if abs(float(self.az) - float(az)) > self._config.getfloat('Rotor','margin_az') or abs(float(self.el) - float(el)) > self._config.getfloat('Rotor','margin_el'):
+            az = az + 360
+            el = el + 360
             az_hondert = int(floor(az/100))
             az_tien = int(floor((az-100*az_hondert)/10))
             az_getallen = int(floor((az-100*az_hondert)-(az_tien*10)))
@@ -32,14 +34,14 @@ class Rotor:
             el_tien = int(floor((el-100*el_hondert)/10))
             el_getallen = int(floor((el-100*el_hondert)-(el_tien*10)))
 
-            command = "573%s3%s3%s30013%s3%s3%s30012F20" % (az_hondert,az_tien,az_getallen,el_hondert,el_tien,el_getallen)
+            command = "57303%s3%s3%s01303%s3%s3%s012F20" % (az_hondert,az_tien,az_getallen,el_hondert,el_tien,el_getallen)
 
             if not self._config.getboolean('General','test'):
                 self.ser.write(command.decode('hex'))
 
             if self._config.getboolean('Debug','debug'):
                 print command
-                print "Moving rotor to: AZ: %03.1F EL: %03.1f"%(az,el)
+                print "Moving rotor to: AZ: %03.1F EL: %03.1f"%(az-360,el-360)
             self.az = "%03F" % az
             self.el = "%03F" % el
 
