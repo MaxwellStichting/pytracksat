@@ -12,7 +12,7 @@ __author__ = "Rudy Hardeman (zarya,PD0ZRY)"
 
 #Private imports
 #import rotor
-import rotor_md01 as rotor
+import rotor_gs232a as rotor
 import debug
 from audiorecord import Audio
 
@@ -37,9 +37,12 @@ def UpdateTLEs():
     except:
         lastused = date.today() - timedelta(days=2) 
     if lastused < basedate:
-        tles = urllib2.urlopen(_config.get('Sats','keplerurl')).read()
+	Keplers = _config.items( "Keplers" )
         file = open(_config.get('Sats','keplerfile'), 'w')
-        file.write(tles)
+	for key, url in Keplers:
+        	tles = urllib2.urlopen(url).read()
+        	file.write(tles)
+		file.write("\n")
         file.close()
         del file
         return True
@@ -176,9 +179,11 @@ if __name__ == '__main__':
                     sat_found.append([tle[0],math.degrees(sat.alt),math.degrees(sat.az),sat_data[tle[0]][0],sat.range_velocity])
             del sat
         sat_found = sorted(sat_found, key=lambda sat: sat[3], reverse=True)
-    
+        windstop = os.path.isfile("/var/www/windstop")
+        if windstop:
+            Debug.write("Windstop enabled") 
         #If no sats are found
-        if len(sat_found) == 0:
+        if len(sat_found) == 0 or windstop:
             del Rotor
             Rotor = rotor.Rotor(_config.get('Rotor','port'),_config)
             Debug.write("NO SATS FOUND")
