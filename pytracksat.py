@@ -37,12 +37,13 @@ def UpdateTLEs():
     except:
         lastused = date.today() - timedelta(days=2) 
     if lastused < basedate:
-	Keplers = _config.items( "Keplers" )
+        Keplers = _config.items( "Keplers" )
         file = open(_config.get('Sats','keplerfile'), 'w')
-	for key, url in Keplers:
-        	tles = urllib2.urlopen(url).read()
-        	file.write(tles)
-		file.write("\n")
+        for key, url in Keplers:
+            print("Updating: %s" % (key))
+            tles = urllib2.urlopen(url).read()
+            file.write(tles)
+        file.write("\n")
         file.close()
         del file
         return True
@@ -94,7 +95,7 @@ def WriteWebfile(string):
 
     # Do not write the same data twice
     if string == prev_string:
-    	return
+        return
 
     #Open webserver data file
     web_filename = "%s/%s" % (_config.get("Web",'path'), _config.get("Web",'file'))
@@ -105,6 +106,12 @@ def WriteWebfile(string):
     os.rename("%s.tmp" % web_filename, web_filename)
 
     prev_string = string
+
+def Checksubstring(needle,haystack):
+    for array in haystack:
+        if needle in array:
+            return True
+    return False
 
 #Start main program
 if __name__ == '__main__':
@@ -119,11 +126,13 @@ if __name__ == '__main__':
     #Webfile prev data string
     prev_string = ""
 
-    #Create rotor control object
-    Rotor = rotor.Rotor(_config.get('Rotor','port'),_config)
-
     #Create debug object
     Debug = debug.Debug(_config)
+
+    #Create rotor control object
+    Debug.write("Starting rotor driver")
+    Rotor = rotor.Rotor(_config.get('Rotor','port'),_config)
+    Debug.write("Done")
 
     #Hamlib
     if _config.getboolean('Radio','debug'):
@@ -172,24 +181,32 @@ if __name__ == '__main__':
         sat_found = []
         sat_data = GetSatData()
         for tle in tles:
+            Ignore = _config.items( "Kepler Ignore" )
+            if Checksubstring(tle[0],Ignore):
+                print("Ignoring %s"%tle[0])
+                continue
+            #print("Calculating: %s"%tle[0])
             sat = ephem.readtle(tle[0],tle[1],tle[2])
             sat.compute(observer)
-            if math.degrees(sat.alt) > 0 and math.degrees(sat.az) > 0 and math.degrees(sat.alt) < 180:
+            if math.degrees(sat.alt) > -1 and math.degrees(sat.az) > 0 and math.degrees(sat.alt) < 184:
                 if tle[0] in sat_data:
                     sat_found.append([tle[0],math.degrees(sat.alt),math.degrees(sat.az),sat_data[tle[0]][0],sat.range_velocity])
             del sat
         sat_found = sorted(sat_found, key=lambda sat: sat[3], reverse=True)
         windstop = os.path.isfile("/var/www/windstop")
         if windstop:
-            Debug.write("Windstop enabled") 
+            Debug.write("Windstop") 
         #If no sats are found
         if len(sat_found) == 0 or windstop:
             del Rotor
             Rotor = rotor.Rotor(_config.get('Rotor','port'),_config)
             Debug.write("NO SATS FOUND")
             Rotor.send(_config.getint('Rotor','rest_az'),_config.getint('Rotor','rest_el'))
-            WriteWebfile("None,%03.1F,%03.1F,%3.4f,%s,%3.4f,%s\n"%
-                (_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az'),
+            sat_name = "None"
+            if windstop:
+                sat_name = "Windstop"
+            WriteWebfile("%s,%03.1F,%03.1F,%3.4f,%s,%3.4f,%s\n"%
+                (sat_name,_config.getint('Rotor','rest_el'),_config.getint('Rotor','rest_az'),
                 float(_config.getint('Radio','rest_freq_vfoa'))/1000000,
                 _config.get('Radio','rest_modulation_vfoa'),
                 float(_config.getint('Radio','rest_freq_vfob'))/1000000,

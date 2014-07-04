@@ -18,14 +18,21 @@ class Rotor:
         try:
             self.ser = serial.Serial(port, 115200, timeout=1)
         except:
-            self.ser = serial.Serial("%s1" % (port[:-1]), timeout=1) 
+            try:
+                self.ser = serial.Serial("%s1" % (port[:-1]), timeout=1)
+            except:
+                self.ser = serial.Serial("%s2" % (port[:-1]), timeout=1)
         self._config = _config
         self.az = 0
         self.el = 0
  
     def send(self,az,el):
+        elold = 1
         if el > 89.9:
             return
+        if el <= 0:
+            elold = el
+            el = 0
         if abs(float(self.az) - float(az)) > self._config.getfloat('Rotor','margin_az') or abs(float(self.el) - float(el)) > self._config.getfloat('Rotor','margin_el'):
 
             command = "W%03d %03d" % (az,el)
@@ -36,6 +43,8 @@ class Rotor:
             if self._config.getboolean('Debug','debug'):
                 print command
                 print "Moving rotor to: AZ: %03.1F EL: %03.1f"%(az,el)
+            if elold <= 0:
+                el = elold
             self.az = "%03F" % az
             self.el = "%03F" % el
 
