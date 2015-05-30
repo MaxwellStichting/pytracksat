@@ -1,5 +1,5 @@
 [General]
-test=1
+test=0
 
 [Debug]
 debug=1
@@ -11,7 +11,7 @@ path=.
 file=webdata.txt
 
 [Rotor]
-port=/dev/ttyUSB0
+port=/dev/ttyACM0
 rest_el=0
 rest_az=90
 margin_az=4
@@ -23,16 +23,20 @@ lon=5.48776
 
 [Radio]
 debug=0
-model=1
-port=/dev/ttyS0
+model=344
+port=/dev/ttyUSB0
 baudrate=9600
 rest_freq_vfoa=430000000
 rest_freq_vfob=145000000
 rest_modulation_vfoa=FM
 rest_modulation_vfob=FM
-civaddr=0
+civaddr=\x60
 
 [Sats]
 keplerfile=nasabare.txt
-keplerurl=http://www.amsat.org/amsat/ftp/keps/current/nasabare.txt
 satdata=satdata.txt
+
+[Keplers]
+nasa=http://www.amsat.org/amsat/ftp/keps/current/nasabare.txt
+
+[Kepler Ignore]
