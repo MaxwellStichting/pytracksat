@@ -142,7 +142,7 @@ if __name__ == '__main__':
 
     rig = Hamlib.Rig(_config.getint('Radio','model'))
     try:
-        rig.set_conf('rig_port',_radioport)
+        rig.set_conf('rig_port',_config.get('Radio','port'))
         rig.set_conf('rig_baudrate',_config.get('Radio','baudrate'))
     except:
         pass
